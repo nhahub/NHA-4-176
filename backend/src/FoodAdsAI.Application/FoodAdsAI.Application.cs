@@ -1,0 +1,2 @@
+namespace FoodAdsAI.Application;
+

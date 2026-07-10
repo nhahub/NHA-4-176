@@ -1,0 +1,62 @@
+# Env files
+.env
+.env.development
+.env.production
+*.env
+
+# Local run logs
+.run-logs/
+*.log
+
+# Generated output files
+output/
+*.png
+*.jpg
+*.jpeg
+
+# Node/Frontend dependencies and build outputs
+node_modules/
+dist/
+.eslintcache
+*.tsbuildinfo
+frontend/node_modules/
+frontend/dist/
+
+# ASP.NET Core / .NET Build outputs
+[Bb]in/
+[Oo]bj/
+backend/src/*/bin/
+backend/src/*/obj/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Python / FastAPI dependencies and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.venv/
+.tox/
+.coverage
+.coverage.*
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+python-ai-service/app/__pycache__/
+python-ai-service/app/*/__pycache__/
+
+# Huge model checkpoints (optional, if you don't want to push the 13MB adapter)
+# adapter_model.safetensors
+
+# OS Files
+.DS_Store
+Thumbs.db

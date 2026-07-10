@@ -1,0 +1,80 @@
+
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: foodads-postgres-compose
+    environment:
+      POSTGRES_USER: foodadsai
+      POSTGRES_PASSWORD: foodadsai
+      POSTGRES_DB: foodadsai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    restart: unless-stopped
+
+  ai-service:
+    build:
+      context: ./python-ai-service
+      dockerfile: Dockerfile
+    container_name: foodads-ai-service-compose
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - APP_ENVIRONMENT=Development
+      - LORA_ADAPTER_PATH=/app
+      - OUTPUT_DIR=/app/output
+      - ALLOW_PLACEHOLDER_IMAGES=false
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - .:/app
+      - hf_cache:/root/.cache/huggingface
+    depends_on:
+      - postgres
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: foodads-backend-compose
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__FoodAdsAI=Host=postgres;Port=5432;Database=foodadsai;Username=foodadsai;Password=foodadsai
+      - AiService__BaseUrl=http://ai-service:8000
+    depends_on:
+      - postgres
+      - ai-service
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: foodads-frontend-compose
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8080
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  hf_cache:
